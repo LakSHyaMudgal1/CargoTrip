@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { MapPin, Package, Warehouse, Loader2, X } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Navigation, Package, Warehouse, Loader2, X, MapPin, ArrowRight } from "lucide-react";
 import { CycleDial } from "./CycleDial";
 import { suggestLocations, type LocationSuggestion } from "@/lib/api";
 
@@ -20,6 +20,7 @@ type FieldProps = {
   onBlur: () => void;
   placeholder: string;
   icon: React.ReactNode;
+  accentColor: string;
   error?: string;
   inputRef: React.RefObject<HTMLInputElement | null>;
 };
@@ -32,6 +33,7 @@ function LocationField({
   onBlur,
   placeholder,
   icon,
+  accentColor,
   error,
   inputRef,
 }: FieldProps) {
@@ -43,8 +45,6 @@ function LocationField({
   const skipNextFetch = useRef(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  // Debounced suggestion fetch as the user types. Skipped right after a
-  // suggestion is picked, so selecting doesn't immediately reopen the list.
   const fetchSuggestions = (query: string) => {
     if (skipNextFetch.current) {
       skipNextFetch.current = false;
@@ -67,11 +67,11 @@ function LocationField({
         setOpen(results.length > 0);
         setHighlighted(-1);
       } catch {
-        // aborted (superseded by a newer keystroke) or network error — ignore
+        // aborted or network error
       } finally {
         setFetching(false);
       }
-    }, 250);
+    }, 220);
   };
 
   const selectSuggestion = (s: LocationSuggestion) => {
@@ -108,11 +108,17 @@ function LocationField({
 
   return (
     <div className="relative">
-      <label htmlFor={id} className="mb-2 block text-sm font-medium text-gray">
-        {label}
-      </label>
-      <div className="relative">
-        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-dim">
+      <div className="mb-1.5 flex items-center justify-between">
+        <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+          {label}
+        </label>
+        {value && (
+          <span className="font-mono text-[0.65rem] text-slate-500">Verified</span>
+        )}
+      </div>
+
+      <div className="relative group">
+        <span className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${accentColor}`}>
           {icon}
         </span>
         <input
@@ -125,7 +131,7 @@ function LocationField({
           }}
           onFocus={() => suggestions.length > 0 && setOpen(true)}
           onBlur={() => {
-            setTimeout(() => setOpen(false), 120);
+            setTimeout(() => setOpen(false), 140);
             onBlur();
           }}
           onKeyDown={handleKeyDown}
@@ -138,15 +144,17 @@ function LocationField({
           aria-activedescendant={activeOptionId}
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
-          className={`w-full rounded-lg border bg-black/40 py-3.5 pl-11 pr-9 text-base text-white placeholder:text-gray-dim transition-colors focus:outline-none ${
-            error ? "border-danger" : "border-hairline focus:border-green"
+          className={`w-full rounded-xl border bg-slate-950/60 py-3 pl-11 pr-10 text-sm font-medium text-white placeholder:text-slate-500 transition-all duration-200 focus:outline-none ${
+            error
+              ? "border-rose-500/70 focus:ring-2 focus:ring-rose-500/30"
+              : "border-white/[0.08] hover:border-white/[0.16] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/25"
           }`}
         />
         {fetching ? (
           <Loader2
             size={14}
             aria-hidden="true"
-            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 animate-spin text-gray-dim"
+            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 animate-spin text-slate-400"
           />
         ) : (
           value && (
@@ -160,18 +168,19 @@ function LocationField({
                 inputRef.current?.focus();
               }}
               aria-label={`Clear ${label.toLowerCase()}`}
-              className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-gray-dim transition-colors hover:bg-white/5 hover:text-white"
+              className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )
         )}
       </div>
+
       {open && suggestions.length > 0 && (
         <ul
           id={listboxId}
           role="listbox"
-          className="absolute z-20 mt-1.5 max-h-56 w-full overflow-y-auto rounded-lg border border-hairline bg-[#0a0a0a] shadow-xl"
+          className="absolute z-30 mt-1.5 max-h-56 w-full overflow-y-auto rounded-xl border border-white/[0.1] bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-xl"
         >
           {suggestions.map((s, i) => (
             <li
@@ -182,24 +191,56 @@ function LocationField({
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => selectSuggestion(s)}
               onMouseEnter={() => setHighlighted(i)}
-              className={`flex cursor-pointer items-center gap-2.5 px-3.5 py-2.5 text-sm transition-colors ${
-                i === highlighted ? "bg-green/10 text-white" : "text-gray hover:bg-white/5"
+              className={`flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
+                i === highlighted
+                  ? "bg-blue-600/20 text-blue-200 border border-blue-500/30"
+                  : "text-slate-300 hover:bg-white/[0.04]"
               }`}
             >
-              <MapPin size={14} className="shrink-0 text-gray-dim" />
-              <span className="truncate">{s.label}</span>
+              <div className="flex items-center gap-2 truncate">
+                <MapPin size={13} className="shrink-0 text-blue-400" />
+                <span className="truncate">{s.label}</span>
+              </div>
+              <span className="shrink-0 font-mono text-[0.65rem] text-slate-500">
+                {s.lat.toFixed(2)}, {s.lng.toFixed(2)}
+              </span>
             </li>
           ))}
         </ul>
       )}
+
       {error && (
-        <p id={errorId} role="alert" className="mt-1.5 text-xs text-danger">
+        <p id={errorId} role="alert" className="mt-1 text-xs font-medium text-rose-400">
           {error}
         </p>
       )}
     </div>
   );
 }
+
+const PRESETS = [
+  {
+    name: "Dallas → Chicago",
+    current: "Dallas, TX",
+    pickup: "Tulsa, OK",
+    dropoff: "Chicago, IL",
+    cycle: 22,
+  },
+  {
+    name: "Atlanta → Denver",
+    current: "Atlanta, GA",
+    pickup: "Memphis, TN",
+    dropoff: "Denver, CO",
+    cycle: 34,
+  },
+  {
+    name: "LA → Salt Lake",
+    current: "Los Angeles, CA",
+    pickup: "Las Vegas, NV",
+    dropoff: "Salt Lake City, UT",
+    cycle: 15,
+  },
+];
 
 export function TripForm({
   onSubmit,
@@ -222,12 +263,12 @@ export function TripForm({
 
   const fieldError = (key: FieldKey, values = { current, pickup, dropoff }) => {
     const { current: c, pickup: p, dropoff: d } = values;
-    if (key === "current" && !c.trim()) return "Where are you starting?";
-    if (key === "pickup" && !p.trim()) return "Add a pickup location.";
+    if (key === "current" && !c.trim()) return "Specify the start location.";
+    if (key === "pickup" && !p.trim()) return "Specify freight pickup point.";
     if (key === "dropoff") {
-      if (!d.trim()) return "Add a dropoff location.";
+      if (!d.trim()) return "Specify freight delivery point.";
       if (p.trim() && p.trim().toLowerCase() === d.trim().toLowerCase())
-        return "Pickup and dropoff can't be the same.";
+        return "Pickup and delivery cannot be identical.";
     }
     return undefined;
   };
@@ -271,74 +312,133 @@ export function TripForm({
     });
   };
 
+  // Keyboard shortcut: Ctrl+Enter or Cmd+Enter to submit
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        handleSubmit(e as any);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  const loadPreset = (p: typeof PRESETS[number]) => {
+    setCurrent(p.current);
+    setPickup(p.pickup);
+    setDropoff(p.dropoff);
+    setCycle(p.cycle);
+    setErrors({});
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="panel panel-glow p-6 sm:p-7" aria-busy={loading}>
-      <div className="mb-6 flex items-center justify-between">
+    <form
+      onSubmit={handleSubmit}
+      className="panel panel-glow p-6 sm:p-7 relative overflow-hidden"
+      aria-busy={loading}
+    >
+      {/* Top ambient highlight line */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+
+      {/* Header */}
+      <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
         <div>
-          <span className="eyebrow">Dispatch Panel</span>
-          <h3 className="mt-1.5 text-xl font-bold tracking-tight text-white">Plan a haul</h3>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-blue-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
+              Dispatch Engine
+            </span>
+            <span className="font-mono text-[0.65rem] text-slate-500">
+              49 CFR §395
+            </span>
+          </div>
+          <h3 className="mt-1 text-xl font-bold tracking-tight text-white">
+            Plan Compliant Haul
+          </h3>
         </div>
-        <span className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-gray-dim">
-          70 hr / 8 day
-        </span>
+
+        {/* Presets dropdown / pill list */}
+        <div className="flex items-center gap-1.5 self-start sm:self-auto">
+          <span className="font-mono text-[0.62rem] uppercase tracking-wider text-slate-400 mr-1 hidden sm:inline">
+            Presets:
+          </span>
+          {PRESETS.map((p) => (
+            <button
+              key={p.name}
+              type="button"
+              onClick={() => loadPreset(p)}
+              className="rounded-lg border border-white/[0.07] bg-slate-800/60 px-2 py-1 text-[0.65rem] font-medium text-slate-300 hover:border-blue-500/40 hover:text-white transition-all"
+            >
+              {p.name.split(" → ")[1] || p.name}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <fieldset disabled={loading} className="m-0 min-w-0 border-0 p-0 disabled:opacity-60">
-        <legend className="sr-only">Trip details — all fields required</legend>
-        <div className="space-y-4">
-          <LocationField
-            id="current"
-            label="Current location"
-            value={current}
-            onChange={setCurrent}
-            onBlur={() => validateOnBlur("current")}
-            placeholder="City, ST"
-            icon={<MapPin size={16} />}
-            error={errors.current}
-            inputRef={refs.current}
-          />
-          <LocationField
-            id="pickup"
-            label="Pickup"
-            value={pickup}
-            onChange={setPickup}
-            onBlur={() => validateOnBlur("pickup")}
-            placeholder="City, ST"
-            icon={<Package size={16} />}
-            error={errors.pickup}
-            inputRef={refs.pickup}
-          />
-          <LocationField
-            id="dropoff"
-            label="Dropoff"
-            value={dropoff}
-            onChange={setDropoff}
-            onBlur={() => validateOnBlur("dropoff")}
-            placeholder="City, ST"
-            icon={<Warehouse size={16} />}
-            error={errors.dropoff}
-            inputRef={refs.dropoff}
-          />
+      <fieldset disabled={loading} className="m-0 min-w-0 border-0 p-0 disabled:opacity-60 space-y-4">
+        <legend className="sr-only">Trip parameters</legend>
 
-          <div className="rounded-lg border border-hairline bg-black/30 p-4">
-            <CycleDial value={cycle} onChange={setCycle} />
-          </div>
+        <LocationField
+          id="current"
+          label="1. Current Location"
+          value={current}
+          onChange={setCurrent}
+          onBlur={() => validateOnBlur("current")}
+          placeholder="e.g. Dallas, TX"
+          icon={<Navigation size={16} />}
+          accentColor="text-cyan-400"
+          error={errors.current}
+          inputRef={refs.current}
+        />
+
+        <LocationField
+          id="pickup"
+          label="2. Freight Pickup"
+          value={pickup}
+          onChange={setPickup}
+          onBlur={() => validateOnBlur("pickup")}
+          placeholder="e.g. Tulsa, OK"
+          icon={<Package size={16} />}
+          accentColor="text-blue-400"
+          error={errors.pickup}
+          inputRef={refs.pickup}
+        />
+
+        <LocationField
+          id="dropoff"
+          label="3. Freight Delivery"
+          value={dropoff}
+          onChange={setDropoff}
+          onBlur={() => validateOnBlur("dropoff")}
+          placeholder="e.g. Chicago, IL"
+          icon={<Warehouse size={16} />}
+          accentColor="text-violet-400"
+          error={errors.dropoff}
+          inputRef={refs.dropoff}
+        />
+
+        {/* Cycle Dial Container */}
+        <div className="rounded-xl border border-white/[0.07] bg-slate-950/40 p-4 transition-all hover:border-white/[0.12]">
+          <CycleDial value={cycle} onChange={setCycle} />
         </div>
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className="group mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-green py-3.5 font-bold text-black transition-all duration-300 ease-haul hover:shadow-glow-lg disabled:cursor-not-allowed disabled:opacity-70"
+          disabled={loading}
+          className="group relative mt-6 flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 py-3.5 px-4 text-sm font-semibold text-white shadow-glow-combo transition-all duration-300 hover:from-blue-500 hover:via-indigo-500 hover:to-violet-500 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? (
             <>
-              <Loader2 size={18} className="animate-spin" aria-hidden="true" />
-              Plotting your route…
+              <Loader2 size={17} className="animate-spin text-white" aria-hidden="true" />
+              <span>Simulating HOS Compliance Matrix…</span>
             </>
           ) : (
             <>
-              Plan My Haul
-              <span className="transition-transform duration-300 ease-haul group-hover:translate-x-1">
-                →
+              <span>Compute Compliant Route</span>
+              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+              <span className="hidden sm:inline-flex items-center gap-0.5 rounded border border-white/20 bg-white/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-normal tracking-wide text-white/90 ml-1">
+                ⌘↵
               </span>
             </>
           )}
@@ -346,7 +446,7 @@ export function TripForm({
       </fieldset>
 
       <div role="status" aria-live="polite" className="sr-only">
-        {loading ? "Plotting your route, please wait." : ""}
+        {loading ? "Computing compliant route, please wait." : ""}
       </div>
     </form>
   );

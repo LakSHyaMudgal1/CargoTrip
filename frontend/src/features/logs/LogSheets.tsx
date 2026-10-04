@@ -43,7 +43,7 @@ export function LogSheets({ plan }: { plan: TripPlan }) {
 
       const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
       const pageW = doc.internal.pageSize.getWidth();
-      const margin = 22;
+      const margin = 20;
       const w = pageW - margin * 2;
       const h = (SHEET.h / SHEET.w) * w;
 
@@ -63,81 +63,79 @@ export function LogSheets({ plan }: { plan: TripPlan }) {
   }
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 sm:px-6 pb-16 pt-4">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-blue-400">
-              <ShieldCheck size={12} />
-              49 CFR §395.8 Record of Duty Status
-            </span>
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 mb-1">
+            <ShieldCheck size={14} />
+            <span>49 CFR §395.8 Record of Duty Status</span>
           </div>
-          <h2 className="mt-1.5 flex items-center gap-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            <FileText size={22} className="text-blue-400" />
-            Official Daily Logsheets
-          </h2>
+          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <FileText size={18} className="text-blue-600" />
+            Official Driver Daily Logsheets
+          </h3>
         </div>
 
         <button
           type="button"
           onClick={exportPdf}
           disabled={exporting}
-          className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-glow-sm transition-all hover:from-blue-500 hover:to-indigo-500 hover:shadow-glow-combo active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors disabled:opacity-60"
         >
           {exporting ? (
             <>
-              <Loader2 size={16} className="animate-spin" />
-              <span>Generating Vector PDF…</span>
+              <Loader2 size={14} className="animate-spin" />
+              <span>Generating PDF…</span>
             </>
           ) : (
             <>
-              <Download size={16} />
-              <span>Download Official Logs (PDF)</span>
+              <Download size={14} />
+              <span>Export Verified PDF</span>
             </>
           )}
         </button>
       </div>
 
       {/* Day Tabs */}
-      <div className="mb-4 flex flex-wrap gap-2.5">
+      <div className="flex flex-wrap gap-2">
         {sheets.map((s, i) => (
           <button
             key={s.date}
             type="button"
             onClick={() => setActive(i)}
-            className={`rounded-xl border p-3 text-left transition-all ${
+            className={`rounded-lg border px-3 py-2 text-left transition-all ${
               i === active
-                ? "border-blue-500/60 bg-blue-500/10 text-white shadow-glow-sm"
-                : "border-white/[0.08] bg-slate-900/60 text-slate-400 hover:border-white/[0.15] hover:text-white"
+                ? "border-blue-600 bg-blue-50/50 shadow-sm"
+                : "border-slate-200 bg-white hover:border-slate-300 text-slate-700"
             }`}
           >
             <div className="flex items-center justify-between gap-3">
-              <span className="font-mono text-[0.65rem] uppercase tracking-wider text-slate-500 font-semibold">
+              <span className={`text-[0.65rem] font-bold uppercase ${i === active ? "text-blue-700" : "text-slate-400"}`}>
                 Day {s.dayIndex}
               </span>
-              <span className="flex items-center gap-1 font-mono text-[0.62rem] text-emerald-400 font-medium">
+              <span className="flex items-center gap-1 text-[0.62rem] text-emerald-600 font-medium">
                 <CheckCircle2 size={10} />
                 24.0h
               </span>
             </div>
-            <div className="font-mono text-sm font-bold tabular-nums text-white mt-0.5">
+            <div className="font-mono text-xs font-bold text-slate-900 mt-0.5">
               {s.date}
             </div>
-            <div className="font-mono text-[0.68rem] text-slate-400 mt-0.5">
+            <div className="text-[0.68rem] text-slate-500 mt-0.5">
               {Math.round(s.milesToday)} mi driven
             </div>
           </button>
         ))}
       </div>
 
-      {/* Active Log Grid Display Frame */}
-      <div className="panel overflow-hidden p-3 sm:p-4 border border-white/[0.1] bg-slate-950/80 shadow-2xl">
-        <div className="overflow-x-auto rounded-xl bg-white p-2 shadow-inner">
-          <div className="min-w-[740px]">
+      {/* Grid Paper View */}
+      <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto bg-white">
+          <div className="min-w-[720px]">
             <LogSheetSVG
               sheet={sheets[active]}
-              color="green"
+              color="ink"
               carrier={carrier}
               homeTerminal={home}
               shipper={shipper}
@@ -147,12 +145,12 @@ export function LogSheets({ plan }: { plan: TripPlan }) {
         </div>
       </div>
 
-      <div className="mt-3 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-mono gap-1">
-        <span>FMCSA Standard 24h Grid Representation</span>
-        <span>Every change of duty status annotated with location & remark per 49 CFR §395.8</span>
+      <div className="flex items-center justify-between text-[0.7rem] text-slate-400 font-mono">
+        <span>FMCSA Blank Paper Grid Replication</span>
+        <span>Includes signature, recap, and remark lines for road inspection compliance</span>
       </div>
 
-      {/* Offscreen ink render for PDF export */}
+      {/* Offscreen render for PDF */}
       <div aria-hidden className="pointer-events-none fixed left-[-99999px] top-0 w-[1200px]">
         {sheets.map((s, i) => (
           <LogSheetSVG
@@ -169,6 +167,6 @@ export function LogSheets({ plan }: { plan: TripPlan }) {
           />
         ))}
       </div>
-    </section>
+    </div>
   );
 }

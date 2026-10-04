@@ -29,7 +29,7 @@ type Pin = {
   seq: number | null;
 };
 
-const CURRENT_COLOR = "#06B6D4"; // Electric Cyan
+const CURRENT_COLOR = "#2563EB"; // SaaS Blue
 
 function buildPins(events: DutyEvent[], routeGeometry: GeoJsonLine[], currentLabel?: string): Pin[] {
   const pins: Pin[] = [];
@@ -41,7 +41,7 @@ function buildPins(events: DutyEvent[], routeGeometry: GeoJsonLine[], currentLab
       kind: "current",
       lat: origin[1],
       lng: origin[0],
-      location: currentLabel || events[0]?.location || "Trip Start",
+      location: currentLabel || events[0]?.location || "Origin Terminal",
       note: "Trip Origin",
       start: events[0]?.start ?? "",
       end: events[0]?.start ?? "",
@@ -65,7 +65,7 @@ function buildPins(events: DutyEvent[], routeGeometry: GeoJsonLine[], currentLab
       note: e.note,
       start: e.start,
       end: e.end,
-      color: STATUS_COLOR[e.status] || "#3B82F6",
+      color: STATUS_COLOR[e.status] || "#2563EB",
       seq,
     });
   });
@@ -73,7 +73,6 @@ function buildPins(events: DutyEvent[], routeGeometry: GeoJsonLine[], currentLab
   return pins;
 }
 
-/** Builds a modern themed Leaflet divIcon once per (kind, color, seq) combo. */
 function useMarkerIcons(pins: Pin[]) {
   const cache = useRef(new Map<string, L.DivIcon>());
 
@@ -186,19 +185,19 @@ function MapLegend({ kinds }: { kinds: Set<EventKind> }) {
   return (
     <div className="pointer-events-auto absolute bottom-3 left-3 z-[1000]">
       {open && (
-        <div className="mb-2 min-w-[180px] rounded-xl border border-white/[0.1] bg-slate-900/90 p-3 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95">
-          <div className="mb-2 flex items-center justify-between border-b border-white/[0.08] pb-1.5 font-mono text-[0.6rem] uppercase tracking-wider text-slate-400">
-            <span>Route Stops</span>
-            <span>{present.length} Types</span>
+        <div className="mb-2 min-w-[180px] rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+          <div className="mb-2 flex items-center justify-between border-b border-slate-100 pb-1.5 text-xs font-semibold text-slate-700">
+            <span>Route Waypoints</span>
+            <span className="font-mono text-[0.65rem] text-slate-400">{present.length} Types</span>
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-1.5">
             {present.map((kind) => {
               const color = kind === "current" ? CURRENT_COLOR : STATUS_COLOR[statusForKind(kind)];
               return (
-                <li key={kind} className="flex items-center gap-2.5 text-xs text-slate-300">
+                <li key={kind} className="flex items-center gap-2 text-xs text-slate-600">
                   <span
-                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/[0.1] bg-slate-950"
-                    style={{ color, borderColor: `${color}66` }}
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50"
+                    style={{ color, borderColor: `${color}40` }}
                   >
                     <EventIconCmp kind={kind} size={11} />
                   </span>
@@ -213,10 +212,10 @@ function MapLegend({ kinds }: { kinds: Set<EventKind> }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex h-8 items-center gap-1.5 rounded-lg border border-white/[0.1] bg-slate-900/85 px-2.5 font-mono text-[0.65rem] uppercase tracking-wider text-slate-300 shadow-lg backdrop-blur-md transition-all hover:border-blue-500/50 hover:text-white"
+        className="flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 shadow-sm hover:border-slate-300 hover:text-slate-900"
       >
-        <Layers size={13} className="text-blue-400" />
-        <span>Legend</span>
+        <Layers size={13} className="text-blue-600" />
+        <span>Map Legend</span>
       </button>
     </div>
   );
@@ -244,33 +243,26 @@ export function RouteMap({
   const stopCount = pins.filter((p) => p.seq != null).length;
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-xl border border-white/[0.08]">
-      {/* Top telemetry banner */}
-      <div className="pointer-events-none absolute top-3 left-3 z-[1000] flex items-center gap-2 rounded-lg border border-white/[0.08] bg-slate-950/75 px-3 py-1.5 backdrop-blur-md">
-        <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse" />
-        <span className="font-mono text-[0.65rem] uppercase tracking-wider text-slate-300">
-          Live Vector Route · {stopCount} Waypoints
-        </span>
-      </div>
-
+    <div className="relative h-full w-full overflow-hidden bg-slate-100">
       <MapContainer
         center={[39.8283, -98.5795]}
         zoom={4}
         style={{ height: "100%", width: "100%" }}
         className="haulr-map"
       >
+        {/* CARTO Positron Light Tiles */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
-        {/* Electric Blue Route Glow Polyline */}
+        {/* Primary Blue Route Polyline */}
         {polylines.map((positions, i) => (
           <Polyline
-            key={`glow-${i}`}
+            key={`route-${i}`}
             positions={positions}
             pathOptions={{
-              color: "#3B82F6",
+              color: "#2563EB",
               weight: 5,
               opacity: 0.9,
               className: "route-glow-path",
@@ -278,16 +270,16 @@ export function RouteMap({
           />
         ))}
 
-        {/* Cyan Directional Flow Polyline */}
+        {/* Directional Flow Overlay */}
         {polylines.map((positions, i) => (
           <Polyline
             key={`flow-${i}`}
             positions={positions}
             pathOptions={{
-              color: "#38BDF8",
+              color: "#93C5FD",
               weight: 2,
-              opacity: 0.95,
-              dashArray: "2 14",
+              opacity: 0.9,
+              dashArray: "3 12",
               lineCap: "round",
               className: "route-flow-path",
             }}
@@ -298,30 +290,30 @@ export function RouteMap({
           <Marker key={pin.key} position={[pin.lat, pin.lng]} icon={icons.get(pin.key)}>
             <Popup className="haulr-popup">
               <div className="min-w-[190px]">
-                <div className="mb-1.5 flex items-center gap-2 border-b border-white/[0.08] pb-1.5">
+                <div className="mb-1.5 flex items-center gap-2 border-b border-slate-100 pb-1.5">
                   <span
-                    className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800"
+                    className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-100"
                     style={{ color: pin.color }}
                   >
                     <EventIconCmp kind={pin.kind} size={12} />
                   </span>
-                  <span className="text-xs font-bold text-white">
+                  <span className="text-xs font-bold text-slate-900">
                     {EVENT_KIND_LABEL[pin.kind]}
                   </span>
                 </div>
-                <div className="text-xs font-medium text-slate-300 leading-snug">
+                <div className="text-xs font-medium text-slate-600 leading-snug">
                   {pin.location}
                 </div>
-                <div className="mt-2 flex items-center justify-between gap-3 font-mono text-[0.65rem] text-slate-400">
+                <div className="mt-2 flex items-center justify-between gap-3 font-mono text-[0.68rem] text-slate-500">
                   <span>{pin.start ? formatClock(pin.start) : "—"}</span>
                   {pin.kind !== "current" && (
-                    <span className="rounded bg-slate-800 px-1 py-0.5 text-blue-300 font-semibold">
+                    <span className="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-700">
                       {formatDuration((new Date(pin.end).getTime() - new Date(pin.start).getTime()) / 3_600_000)}
                     </span>
                   )}
                 </div>
                 {pin.seq != null && (
-                  <div className="mt-2 border-t border-white/[0.08] pt-1.5 font-mono text-[0.6rem] uppercase tracking-wider text-slate-500">
+                  <div className="mt-2 border-t border-slate-100 pt-1.5 font-mono text-[0.62rem] text-slate-400">
                     Stop #{pin.seq} of {stopCount}
                   </div>
                 )}

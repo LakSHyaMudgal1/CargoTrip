@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Navigation, Package, Warehouse, Loader2, X, MapPin, ArrowRight } from "lucide-react";
 import { CycleDial } from "./CycleDial";
 import { suggestLocations, type LocationSuggestion } from "@/lib/api";
@@ -20,7 +20,6 @@ type FieldProps = {
   onBlur: () => void;
   placeholder: string;
   icon: React.ReactNode;
-  accentColor: string;
   error?: string;
   inputRef: React.RefObject<HTMLInputElement | null>;
 };
@@ -33,7 +32,6 @@ function LocationField({
   onBlur,
   placeholder,
   icon,
-  accentColor,
   error,
   inputRef,
 }: FieldProps) {
@@ -71,7 +69,7 @@ function LocationField({
       } finally {
         setFetching(false);
       }
-    }, 220);
+    }, 200);
   };
 
   const selectSuggestion = (s: LocationSuggestion) => {
@@ -102,23 +100,14 @@ function LocationField({
     }
   };
 
-  const errorId = `${id}-error`;
-  const listboxId = `${id}-listbox`;
-  const activeOptionId = highlighted >= 0 ? `${id}-option-${highlighted}` : undefined;
-
   return (
     <div className="relative">
-      <div className="mb-1.5 flex items-center justify-between">
-        <label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-slate-300">
-          {label}
-        </label>
-        {value && (
-          <span className="font-mono text-[0.65rem] text-slate-500">Verified</span>
-        )}
-      </div>
+      <label htmlFor={id} className="block text-xs font-semibold text-slate-700 mb-1.5">
+        {label}
+      </label>
 
-      <div className="relative group">
-        <span className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${accentColor}`}>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
           {icon}
         </span>
         <input
@@ -137,24 +126,17 @@ function LocationField({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           autoComplete="off"
-          role="combobox"
-          aria-expanded={open}
-          aria-autocomplete="list"
-          aria-controls={listboxId}
-          aria-activedescendant={activeOptionId}
-          aria-invalid={!!error}
-          aria-describedby={error ? errorId : undefined}
-          className={`w-full rounded-xl border bg-slate-950/60 py-3 pl-11 pr-10 text-sm font-medium text-white placeholder:text-slate-500 transition-all duration-200 focus:outline-none ${
+          className={`w-full rounded-lg border bg-white py-2 pl-9 pr-8 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-none ${
             error
-              ? "border-rose-500/70 focus:ring-2 focus:ring-rose-500/30"
-              : "border-white/[0.08] hover:border-white/[0.16] focus:border-blue-500 focus:ring-2 focus:ring-blue-500/25"
+              ? "border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              : "border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600"
           }`}
         />
         {fetching ? (
           <Loader2
-            size={14}
+            size={13}
             aria-hidden="true"
-            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 animate-spin text-slate-400"
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-slate-400"
           />
         ) : (
           value && (
@@ -167,42 +149,32 @@ function LocationField({
                 setOpen(false);
                 inputRef.current?.focus();
               }}
-              aria-label={`Clear ${label.toLowerCase()}`}
-              className="absolute right-2.5 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+              className="absolute right-2.5 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded text-slate-400 hover:text-slate-600"
             >
-              <X size={13} />
+              <X size={12} />
             </button>
           )
         )}
       </div>
 
       {open && suggestions.length > 0 && (
-        <ul
-          id={listboxId}
-          role="listbox"
-          className="absolute z-30 mt-1.5 max-h-56 w-full overflow-y-auto rounded-xl border border-white/[0.1] bg-slate-900/95 p-1.5 shadow-2xl backdrop-blur-xl"
-        >
+        <ul className="absolute z-30 mt-1 max-h-52 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
           {suggestions.map((s, i) => (
             <li
               key={`${s.label}-${s.lat}-${s.lng}`}
-              id={`${id}-option-${i}`}
-              role="option"
-              aria-selected={i === highlighted}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => selectSuggestion(s)}
               onMouseEnter={() => setHighlighted(i)}
-              className={`flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
-                i === highlighted
-                  ? "bg-blue-600/20 text-blue-200 border border-blue-500/30"
-                  : "text-slate-300 hover:bg-white/[0.04]"
+              className={`flex cursor-pointer items-center justify-between rounded-md px-2.5 py-1.5 text-xs ${
+                i === highlighted ? "bg-blue-50 text-blue-900 font-medium" : "text-slate-700 hover:bg-slate-50"
               }`}
             >
-              <div className="flex items-center gap-2 truncate">
-                <MapPin size={13} className="shrink-0 text-blue-400" />
+              <div className="flex items-center gap-1.5 truncate">
+                <MapPin size={12} className="shrink-0 text-blue-600" />
                 <span className="truncate">{s.label}</span>
               </div>
-              <span className="shrink-0 font-mono text-[0.65rem] text-slate-500">
-                {s.lat.toFixed(2)}, {s.lng.toFixed(2)}
+              <span className="shrink-0 font-mono text-[0.62rem] text-slate-400">
+                {s.lat.toFixed(1)}, {s.lng.toFixed(1)}
               </span>
             </li>
           ))}
@@ -210,7 +182,7 @@ function LocationField({
       )}
 
       {error && (
-        <p id={errorId} role="alert" className="mt-1 text-xs font-medium text-rose-400">
+        <p className="mt-1 text-xs text-red-600 font-medium">
           {error}
         </p>
       )}
@@ -219,27 +191,9 @@ function LocationField({
 }
 
 const PRESETS = [
-  {
-    name: "Dallas → Chicago",
-    current: "Dallas, TX",
-    pickup: "Tulsa, OK",
-    dropoff: "Chicago, IL",
-    cycle: 22,
-  },
-  {
-    name: "Atlanta → Denver",
-    current: "Atlanta, GA",
-    pickup: "Memphis, TN",
-    dropoff: "Denver, CO",
-    cycle: 34,
-  },
-  {
-    name: "LA → Salt Lake",
-    current: "Los Angeles, CA",
-    pickup: "Las Vegas, NV",
-    dropoff: "Salt Lake City, UT",
-    cycle: 15,
-  },
+  { name: "Dallas → Chicago", current: "Dallas, TX", pickup: "Tulsa, OK", dropoff: "Chicago, IL", cycle: 22 },
+  { name: "Atlanta → Denver", current: "Atlanta, GA", pickup: "Memphis, TN", dropoff: "Denver, CO", cycle: 34 },
+  { name: "LA → Salt Lake", current: "Los Angeles, CA", pickup: "Las Vegas, NV", dropoff: "Salt Lake City, UT", cycle: 15 },
 ];
 
 export function TripForm({
@@ -263,12 +217,12 @@ export function TripForm({
 
   const fieldError = (key: FieldKey, values = { current, pickup, dropoff }) => {
     const { current: c, pickup: p, dropoff: d } = values;
-    if (key === "current" && !c.trim()) return "Specify the start location.";
-    if (key === "pickup" && !p.trim()) return "Specify freight pickup point.";
+    if (key === "current" && !c.trim()) return "Enter starting location.";
+    if (key === "pickup" && !p.trim()) return "Enter pickup facility.";
     if (key === "dropoff") {
-      if (!d.trim()) return "Specify freight delivery point.";
+      if (!d.trim()) return "Enter delivery destination.";
       if (p.trim() && p.trim().toLowerCase() === d.trim().toLowerCase())
-        return "Pickup and delivery cannot be identical.";
+        return "Pickup and delivery cannot be the same.";
     }
     return undefined;
   };
@@ -312,17 +266,6 @@ export function TripForm({
     });
   };
 
-  // Keyboard shortcut: Ctrl+Enter or Cmd+Enter to submit
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-        handleSubmit(e as any);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  });
-
   const loadPreset = (p: typeof PRESETS[number]) => {
     setCurrent(p.current);
     setPickup(p.pickup);
@@ -332,122 +275,88 @@ export function TripForm({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="panel panel-glow p-6 sm:p-7 relative overflow-hidden"
-      aria-busy={loading}
-    >
-      {/* Top ambient highlight line */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-
-      {/* Header */}
-      <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-blue-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
-              Dispatch Engine
-            </span>
-            <span className="font-mono text-[0.65rem] text-slate-500">
-              49 CFR §395
-            </span>
-          </div>
-          <h3 className="mt-1 text-xl font-bold tracking-tight text-white">
-            Plan Compliant Haul
-          </h3>
-        </div>
-
-        {/* Presets dropdown / pill list */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto">
-          <span className="font-mono text-[0.62rem] uppercase tracking-wider text-slate-400 mr-1 hidden sm:inline">
-            Presets:
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Route Presets */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Quick Route Presets
           </span>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
           {PRESETS.map((p) => (
             <button
               key={p.name}
               type="button"
               onClick={() => loadPreset(p)}
-              className="rounded-lg border border-white/[0.07] bg-slate-800/60 px-2 py-1 text-[0.65rem] font-medium text-slate-300 hover:border-blue-500/40 hover:text-white transition-all"
+              className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 hover:border-blue-400 hover:text-blue-700 transition-colors"
             >
-              {p.name.split(" → ")[1] || p.name}
+              {p.name}
             </button>
           ))}
         </div>
       </div>
 
-      <fieldset disabled={loading} className="m-0 min-w-0 border-0 p-0 disabled:opacity-60 space-y-4">
-        <legend className="sr-only">Trip parameters</legend>
-
+      {/* Inputs */}
+      <div className="space-y-3">
         <LocationField
           id="current"
-          label="1. Current Location"
+          label="Origin Terminal"
           value={current}
           onChange={setCurrent}
           onBlur={() => validateOnBlur("current")}
-          placeholder="e.g. Dallas, TX"
-          icon={<Navigation size={16} />}
-          accentColor="text-cyan-400"
+          placeholder="City, State (e.g. Dallas, TX)"
+          icon={<Navigation size={14} />}
           error={errors.current}
           inputRef={refs.current}
         />
 
         <LocationField
           id="pickup"
-          label="2. Freight Pickup"
+          label="Freight Pickup"
           value={pickup}
           onChange={setPickup}
           onBlur={() => validateOnBlur("pickup")}
-          placeholder="e.g. Tulsa, OK"
-          icon={<Package size={16} />}
-          accentColor="text-blue-400"
+          placeholder="City, State (e.g. Tulsa, OK)"
+          icon={<Package size={14} />}
           error={errors.pickup}
           inputRef={refs.pickup}
         />
 
         <LocationField
           id="dropoff"
-          label="3. Freight Delivery"
+          label="Freight Delivery"
           value={dropoff}
           onChange={setDropoff}
           onBlur={() => validateOnBlur("dropoff")}
-          placeholder="e.g. Chicago, IL"
-          icon={<Warehouse size={16} />}
-          accentColor="text-violet-400"
+          placeholder="City, State (e.g. Chicago, IL)"
+          icon={<Warehouse size={14} />}
           error={errors.dropoff}
           inputRef={refs.dropoff}
         />
-
-        {/* Cycle Dial Container */}
-        <div className="rounded-xl border border-white/[0.07] bg-slate-950/40 p-4 transition-all hover:border-white/[0.12]">
-          <CycleDial value={cycle} onChange={setCycle} />
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="group relative mt-6 flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 py-3.5 px-4 text-sm font-semibold text-white shadow-glow-combo transition-all duration-300 hover:from-blue-500 hover:via-indigo-500 hover:to-violet-500 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? (
-            <>
-              <Loader2 size={17} className="animate-spin text-white" aria-hidden="true" />
-              <span>Simulating HOS Compliance Matrix…</span>
-            </>
-          ) : (
-            <>
-              <span>Compute Compliant Route</span>
-              <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
-              <span className="hidden sm:inline-flex items-center gap-0.5 rounded border border-white/20 bg-white/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-normal tracking-wide text-white/90 ml-1">
-                ⌘↵
-              </span>
-            </>
-          )}
-        </button>
-      </fieldset>
-
-      <div role="status" aria-live="polite" className="sr-only">
-        {loading ? "Computing compliant route, please wait." : ""}
       </div>
+
+      {/* Cycle Dial */}
+      <CycleDial value={cycle} onChange={setCycle} />
+
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 px-4 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {loading ? (
+          <>
+            <Loader2 size={16} className="animate-spin" />
+            <span>Calculating HOS Route…</span>
+          </>
+        ) : (
+          <>
+            <span>Generate Compliant Dispatch Plan</span>
+            <ArrowRight size={15} />
+          </>
+        )}
+      </button>
     </form>
   );
 }

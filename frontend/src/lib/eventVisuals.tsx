@@ -13,14 +13,14 @@ import {
 import type { DutyStatus } from "./api";
 
 /**
- * Modern SaaS palette for duty-status and per-event telemetry visuals.
- * Cohesive electric blue + violet + amber + slate scheme across timeline and map.
+ * Commercial Logistics SaaS Duty Status Palette
+ * Blue = Active Transit, Orange = Rest & Sleeper, Green = Verified Compliant, Slate = Off Duty
  */
 export const STATUS_COLOR: Record<DutyStatus, string> = {
-  Driving: "#3B82F6",       // Electric Blue
-  "Sleeper Berth": "#8B5CF6", // Electric Violet
-  "On Duty": "#F59E0B",     // Amber / Gold
-  "Off Duty": "#64748B",    // Cool Slate
+  Driving: "#2563EB",         // Brand SaaS Blue
+  "Sleeper Berth": "#F59E0B", // Orange / Mandatory Sleeper
+  "On Duty": "#3B82F6",       // Active Freight Handling Blue
+  "Off Duty": "#64748B",      // Slate Neutral
 };
 
 export type EventKind =
@@ -35,15 +35,15 @@ export type EventKind =
   | "driving";
 
 export const EVENT_KIND_LABEL: Record<EventKind, string> = {
-  current: "Trip Origin",
+  current: "Origin Facility",
   pickup: "Freight Pickup",
-  dropoff: "Freight Delivery",
+  dropoff: "Delivery Consignee",
   fuel: "Fuel Stop",
-  break: "30-Min Rest Break",
-  restart: "34-Hr Reset",
-  rest: "10-Hr Sleeper Rest",
+  break: "Mandatory 30m Rest Break",
+  restart: "34-Hour Restart Window",
+  rest: "10-Hour Sleeper Berth",
   pretrip: "Pre-Trip Inspection",
-  driving: "Active Transit",
+  driving: "Highway Transit",
 };
 
 const EVENT_ICON_CMP: Record<EventKind, ComponentType<{ size?: number; className?: string }>> = {
@@ -75,16 +75,11 @@ export function EventIconCmp({ kind, size = 15, className }: { kind: EventKind; 
   return <Icon size={size} className={className} />;
 }
 
-/** Kept for existing call sites that pass a raw note string. */
 export function eventIcon(note: string, size = 15) {
   const Icon = EVENT_ICON_CMP[getEventKind(note)];
   return <Icon size={size} />;
 }
 
-/**
- * Map pins only show "real" stops — never one-per-driving-segment noise and
- * never the (mostly co-located) pre-trip inspection bookkeeping event.
- */
 export function isMapPinKind(kind: EventKind): boolean {
   return kind !== "driving" && kind !== "pretrip";
 }
@@ -100,7 +95,8 @@ export function formatDuration(hours: number): string {
 
 export function formatClock(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
-    weekday: "short",
+    month: "short",
+    day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });

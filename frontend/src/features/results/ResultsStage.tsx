@@ -14,7 +14,6 @@ function StatCard({
   unit,
   subtext,
   icon,
-  accentColor,
 }: {
   label: string;
   value: string;
@@ -24,20 +23,19 @@ function StatCard({
   accentColor?: string;
 }) {
   return (
-    <div className="panel relative overflow-hidden p-4 sm:p-5 transition-all duration-300 hover:border-white/[0.15]">
-      <div className={`absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r ${accentColor || "from-blue-500 to-indigo-500"}`} />
-      <div className="flex items-center justify-between text-slate-400 mb-2">
-        <span className="font-mono text-[0.68rem] uppercase tracking-wider text-slate-400 font-medium">
+    <div className="relative overflow-hidden rounded-xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-sm transition-all duration-200 hover:shadow-md">
+      <div className="flex items-center justify-between text-slate-500 mb-2">
+        <span className="font-mono text-[0.68rem] uppercase tracking-wider text-slate-500 font-semibold">
           {label}
         </span>
-        {icon && <span className="text-slate-400">{icon}</span>}
+        {icon && <span className="text-blue-600">{icon}</span>}
       </div>
-      <div className="font-mono text-2xl sm:text-3xl font-bold tabular-nums text-white tracking-tight">
+      <div className="font-mono text-2xl sm:text-3xl font-bold tabular-nums text-slate-900 tracking-tight">
         {value}
-        {unit && <span className="ml-1 text-sm font-semibold text-slate-400">{unit}</span>}
+        {unit && <span className="ml-1 text-sm font-semibold text-slate-500">{unit}</span>}
       </div>
       {subtext && (
-        <div className="mt-1 text-xs text-slate-400 truncate">
+        <div className="mt-1 text-xs text-slate-500 truncate">
           {subtext}
         </div>
       )}
@@ -80,21 +78,21 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
       }
     >
       {/* Header Bar */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] pb-4">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-emerald-400">
-              <CheckCircle2 size={12} className="text-emerald-400" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 font-mono text-[0.65rem] font-semibold uppercase tracking-wider text-emerald-700">
+              <CheckCircle2 size={12} className="text-emerald-600" />
               100% FMCSA Compliant
             </span>
             {summary.restarts > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-pink-500/30 bg-pink-500/10 px-2.5 py-0.5 font-mono text-[0.65rem] font-medium text-pink-400">
+              <span className="inline-flex items-center gap-1 rounded-full border border-orange-200 bg-orange-50 px-2.5 py-0.5 font-mono text-[0.65rem] font-medium text-orange-700">
                 <ShieldAlert size={12} />
                 {summary.restarts} × 34-hr Reset
               </span>
             )}
           </div>
-          <h2 className="mt-1.5 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+          <h2 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
             Compliant Route Orchestration
           </h2>
         </div>
@@ -104,9 +102,9 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
             <button
               type="button"
               onClick={onViewLogSheets}
-              className="group flex items-center gap-2 rounded-xl border border-white/[0.1] bg-slate-900/90 px-3.5 py-2 text-xs font-semibold text-slate-200 shadow-md backdrop-blur-md transition-all hover:border-blue-500/50 hover:bg-slate-800/90 hover:text-white"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-blue-700"
             >
-              <FileText size={14} className="text-blue-400" />
+              <FileText size={14} />
               <span>Official ELD Logs</span>
             </button>
           )}
@@ -115,9 +113,9 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
             <button
               type="button"
               onClick={onEdit}
-              className="group flex items-center gap-1.5 rounded-xl border border-white/[0.1] bg-slate-900/90 px-3.5 py-2 text-xs font-semibold text-slate-300 shadow-md backdrop-blur-md transition-all hover:border-white/[0.2] hover:text-white"
+              className="flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900"
             >
-              <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+              <ArrowLeft size={14} />
               <span>Edit Parameters</span>
             </button>
           )}
@@ -134,7 +132,6 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
           unit="hrs"
           subtext="Under 11h driving window"
           icon={<Navigation size={14} />}
-          accentColor="from-blue-500 via-cyan-500 to-indigo-500"
         />
         <StatCard
           label="On-Duty Total"
@@ -142,29 +139,26 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
           unit="hrs"
           subtext="14h consecutive rule verified"
           icon={<Clock size={14} />}
-          accentColor="from-indigo-500 via-violet-500 to-purple-500"
         />
         <StatCard
           label="Transit Days"
           value={String(summary.days)}
           unit="days"
           subtext="Calendar cycle span"
-          accentColor="from-violet-500 via-purple-500 to-pink-500"
         />
         <StatCard
           label="Scheduled Stops"
           value={String(stopsCount)}
           unit="stops"
           subtext={`${summary.rests} rests · ${summary.breaks} breaks · ${summary.fuelStops} fuel`}
-          accentColor="from-amber-500 via-orange-500 to-rose-500"
         />
       </div>
 
       {/* Duty Status Timeline Ribbon */}
-      <div className="panel shrink-0 p-4">
+      <div className="rounded-xl border border-slate-200/80 bg-white shrink-0 p-4 shadow-sm">
         <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[0.68rem] uppercase font-semibold tracking-wider text-slate-300">
+            <span className="font-mono text-[0.68rem] uppercase font-semibold tracking-wider text-slate-700">
               Duty Status Allocation
             </span>
             <span className="font-mono text-[0.62rem] text-slate-500">
@@ -174,7 +168,7 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
 
           <div className="flex flex-wrap gap-3">
             {(Object.keys(STATUS_COLOR) as DutyStatus[]).map((s) => (
-              <span key={s} className="flex items-center gap-1.5 text-[0.68rem] font-medium text-slate-400">
+              <span key={s} className="flex items-center gap-1.5 text-[0.68rem] font-medium text-slate-600">
                 <span
                   className="inline-block h-2 w-2 rounded-full shadow-sm"
                   style={{ background: STATUS_COLOR[s] }}
@@ -186,13 +180,13 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
         </div>
 
         {/* Multi-segment progress bar */}
-        <div className="flex h-5 overflow-hidden rounded-lg border border-white/[0.08] bg-slate-950/60 p-0.5">
+        <div className="flex h-5 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 p-0.5">
           {events.map((e, i) => {
             const w = (hrs(e.start, e.end) / total) * 100;
             return (
               <div
                 key={i}
-                className="h-full rounded-sm transition-all duration-200 hover:opacity-80 hover:brightness-125 cursor-help"
+                className="h-full rounded-sm transition-all duration-200 hover:opacity-85 hover:brightness-110 cursor-help"
                 style={{
                   width: `${w}%`,
                   background: STATUS_COLOR[e.status],
@@ -213,12 +207,12 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
         }
       >
         {/* Timeline Event Node Feed */}
-        <div className="panel flex min-h-0 flex-col p-4">
-          <div className="mb-3 flex items-center justify-between shrink-0 border-b border-white/[0.06] pb-2">
-            <span className="font-mono text-[0.68rem] uppercase tracking-wider text-slate-300 font-semibold">
+        <div className="rounded-xl border border-slate-200/80 bg-white flex min-h-0 flex-col p-4 shadow-sm">
+          <div className="mb-3 flex items-center justify-between shrink-0 border-b border-slate-100 pb-2">
+            <span className="font-mono text-[0.68rem] uppercase tracking-wider text-slate-700 font-semibold">
               Event Sequence ({events.length} Legs)
             </span>
-            <span className="font-mono text-[0.62rem] text-slate-500">
+            <span className="font-mono text-[0.62rem] text-slate-400">
               Deterministic Order
             </span>
           </div>
@@ -235,10 +229,10 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
               return (
                 <li
                   key={i}
-                  className="group flex items-center gap-3 rounded-xl border border-transparent px-2.5 py-2 transition-all hover:border-white/[0.08] hover:bg-slate-800/40"
+                  className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50/50 px-2.5 py-2 transition-all hover:border-slate-200 hover:bg-slate-50"
                 >
                   <span
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-slate-900 shadow-sm"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-sm"
                     style={{
                       color: STATUS_COLOR[e.status],
                       backgroundColor: `${STATUS_COLOR[e.status]}15`,
@@ -247,14 +241,14 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
                     {eventIcon(e.note, 14)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs font-semibold text-white group-hover:text-blue-300 transition-colors">
+                    <div className="truncate text-xs font-semibold text-slate-900">
                       {e.note}
                     </div>
-                    <div className="flex items-center gap-2 font-mono text-[0.68rem] text-slate-400 mt-0.5">
+                    <div className="flex items-center gap-2 font-mono text-[0.68rem] text-slate-500 mt-0.5">
                       <span
                         className="rounded px-1.5 py-0.2 font-medium"
                         style={{
-                          backgroundColor: `${STATUS_COLOR[e.status]}20`,
+                          backgroundColor: `${STATUS_COLOR[e.status]}15`,
                           color: STATUS_COLOR[e.status],
                         }}
                       >
@@ -264,7 +258,7 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
                       <span>{duration.toFixed(2)} hrs</span>
                     </div>
                   </div>
-                  <div className="shrink-0 text-right font-mono text-[0.68rem] text-slate-400 font-medium">
+                  <div className="shrink-0 text-right font-mono text-[0.68rem] text-slate-500 font-medium">
                     {fmtTime(e.start)}
                   </div>
                 </li>
@@ -276,7 +270,7 @@ export const ResultsStage = forwardRef<HTMLElement, Props>(function ResultsStage
         {/* Interactive Map */}
         <div
           className={
-            "panel relative z-0 flex min-h-0 flex-col items-center justify-center overflow-hidden p-0" +
+            "rounded-xl border border-slate-200/80 bg-white relative z-0 flex min-h-0 flex-col items-center justify-center overflow-hidden p-0 shadow-sm" +
             (fit ? " h-[280px] lg:h-auto" : " h-[400px]")
           }
         >

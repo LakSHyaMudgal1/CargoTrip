@@ -143,14 +143,13 @@ export const ChatDock: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-600 text-white shadow-glow-combo transition-all duration-300 hover:scale-105 hover:shadow-glow-lg active:scale-95"
+          className="group relative flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-blue-700 active:scale-95"
           title="Open Rig AI Copilot"
         >
-          <div className="absolute inset-0 rounded-2xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <MessageSquare size={22} className="relative z-10 transition-transform group-hover:scale-110" />
+          <MessageSquare size={22} className="relative z-10" />
           
           {/* Subtle status pulse */}
-          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-cyan-400 shadow-glow-sm">
+          <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 shadow-sm">
             <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
           </span>
         </button>
@@ -158,24 +157,24 @@ export const ChatDock: React.FC = () => {
 
       {/* Modern AI Chat Drawer Window */}
       {isOpen && (
-        <div className="chat-dock-panel flex h-[580px] w-[390px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-white/[0.12] bg-slate-900/95 shadow-2xl backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-5 duration-300">
+        <div className="chat-dock-panel flex h-[580px] w-[390px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header Bar */}
-          <div className="relative border-b border-white/[0.08] bg-slate-950/70 px-4 py-3.5 flex items-center justify-between">
+          <div className="relative border-b border-slate-200 bg-slate-50 px-4 py-3.5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative flex-shrink-0 w-9 h-9 rounded-xl overflow-hidden border border-blue-500/40 shadow-glow-sm">
+              <div className="relative flex-shrink-0 w-9 h-9 rounded-xl overflow-hidden border border-blue-600/30 shadow-sm">
                 <img src="/rig_ai_avatar.jpg" alt="Rig Avatar" className="w-full h-full object-cover" />
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-[1.5px] border-slate-950" />
+                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-[1.5px] border-white" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-sans text-sm font-bold text-white tracking-tight">
+                  <h3 className="font-sans text-sm font-bold text-slate-900 tracking-tight">
                     Rig Copilot
                   </h3>
-                  <span className="rounded-full bg-blue-500/10 border border-blue-500/30 px-1.5 py-0.2 font-mono text-[0.6rem] font-semibold text-blue-400">
+                  <span className="rounded-full bg-blue-50 border border-blue-200 px-1.5 py-0.2 font-mono text-[0.6rem] font-semibold text-blue-700">
                     AI Agent
                   </span>
                 </div>
-                <span className="font-mono text-[0.62rem] text-slate-400 flex items-center gap-1">
+                <span className="font-mono text-[0.62rem] text-slate-500 flex items-center gap-1">
                   Gemini 2.5 Flash · RAG Active
                 </span>
               </div>
@@ -183,7 +182,7 @@ export const ChatDock: React.FC = () => {
 
             <button
               onClick={() => setIsOpen(false)}
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200 hover:text-slate-700 transition-colors"
               title="Close Copilot"
             >
               <X size={16} />
@@ -191,7 +190,7 @@ export const ChatDock: React.FC = () => {
           </div>
 
           {/* Messages Stream */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-slate-50/50">
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -200,45 +199,45 @@ export const ChatDock: React.FC = () => {
                 {m.text && (
                   <div className={`flex gap-2.5 max-w-[92%] ${m.sender === "user" ? "flex-row-reverse" : "flex-row"}`}>
                     {m.sender === "bot" && (
-                      <div className="flex-shrink-0 w-7 h-7 rounded-lg overflow-hidden border border-white/[0.1] bg-slate-800 mt-auto mb-1">
+                      <div className="flex-shrink-0 w-7 h-7 rounded-lg overflow-hidden border border-slate-200 bg-white mt-auto mb-1 shadow-sm">
                         <img src="/rig_ai_avatar.jpg" alt="Rig" className="w-full h-full object-cover" />
                       </div>
                     )}
                     <div
                       className={`rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed ${
                         m.sender === "user"
-                          ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-tr-sm shadow-md"
-                          : "border border-white/[0.08] bg-slate-950/70 text-slate-200 rounded-tl-sm shadow-sm"
+                          ? "bg-blue-600 text-white font-medium rounded-tr-sm shadow-sm"
+                          : "border border-slate-200 bg-white text-slate-800 rounded-tl-sm shadow-sm"
                       }`}
                     >
                       {m.sender === "bot" ? (
                         <div className="react-markdown-container space-y-1.5">
                           <ReactMarkdown
                             components={{
-                              strong: ({ node, ...props }) => <strong className="text-white font-bold" {...props} />,
+                              strong: ({ node, ...props }) => <strong className="text-slate-900 font-bold" {...props} />,
                               a: ({ node, ...props }) => (
                                 <a
-                                  className="text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-4 transition-colors"
+                                  className="text-blue-600 hover:text-blue-700 font-semibold underline underline-offset-4 transition-colors"
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   {...props}
                                 />
                               ),
-                              p: ({ node, ...props }) => <p className="my-1 text-slate-200" {...props} />,
-                              ul: ({ node, ...props }) => <ul className="my-1.5 pl-4 list-disc marker:text-blue-400" {...props} />,
-                              ol: ({ node, ...props }) => <ol className="my-1.5 pl-4 list-decimal marker:text-blue-400" {...props} />,
+                              p: ({ node, ...props }) => <p className="my-1 text-slate-700" {...props} />,
+                              ul: ({ node, ...props }) => <ul className="my-1.5 pl-4 list-disc marker:text-blue-600" {...props} />,
+                              ol: ({ node, ...props }) => <ol className="my-1.5 pl-4 list-decimal marker:text-blue-600" {...props} />,
                               li: ({ node, ...props }) => <li className="my-0.5" {...props} />,
                               code: ({ node, ...props }) => (
                                 <code
-                                  className="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-[0.75rem] text-cyan-300 border border-white/[0.08]"
+                                  className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.75rem] text-slate-800 border border-slate-200"
                                   {...props}
                                 />
                               ),
-                              h1: ({ node, ...props }) => <h1 className="text-base font-bold text-white mt-2 mb-1" {...props} />,
-                              h2: ({ node, ...props }) => <h2 className="text-sm font-bold text-white mt-2 mb-1" {...props} />,
-                              h3: ({ node, ...props }) => <h3 className="text-xs font-bold text-white mt-1.5 mb-0.5" {...props} />,
+                              h1: ({ node, ...props }) => <h1 className="text-base font-bold text-slate-900 mt-2 mb-1" {...props} />,
+                              h2: ({ node, ...props }) => <h2 className="text-sm font-bold text-slate-900 mt-2 mb-1" {...props} />,
+                              h3: ({ node, ...props }) => <h3 className="text-xs font-bold text-slate-900 mt-1.5 mb-0.5" {...props} />,
                               blockquote: ({ node, ...props }) => (
-                                <blockquote className="border-l-2 border-blue-500/60 pl-2.5 my-1.5 text-slate-400 italic" {...props} />
+                                <blockquote className="border-l-2 border-blue-600 pl-2.5 my-1.5 text-slate-600 italic" {...props} />
                               ),
                             }}
                           >
@@ -250,7 +249,7 @@ export const ChatDock: React.FC = () => {
                       )}
 
                       {m.isStreaming && (
-                        <span className="inline-block w-1.5 h-3 ml-1 bg-blue-400 animate-pulse rounded-sm" />
+                        <span className="inline-block w-1.5 h-3 ml-1 bg-blue-600 animate-pulse rounded-sm" />
                       )}
                     </div>
                   </div>
@@ -283,7 +282,7 @@ export const ChatDock: React.FC = () => {
                           ? (c.title?.slice(0, 26) || host)
                           : "Handbook FAQ";
 
-                      const chipClass = "inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-slate-950/70 px-2 py-1 font-mono text-[0.62rem] text-cyan-300 hover:border-cyan-500/40 hover:text-white transition-all";
+                      const chipClass = "inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2 py-1 font-mono text-[0.62rem] text-slate-700 hover:border-blue-600 hover:text-blue-600 shadow-sm transition-all";
 
                       return isWeb ? (
                         <a
@@ -294,12 +293,12 @@ export const ChatDock: React.FC = () => {
                           className={chipClass}
                           title={c.title || c.source}
                         >
-                          <Compass size={11} className="text-cyan-400" />
+                          <Compass size={11} className="text-blue-600" />
                           <span>{citationLabel}</span>
                         </a>
                       ) : (
                         <div key={i} className={chipClass + " cursor-help"} title={c.snippet}>
-                          <FileText size={11} className="text-blue-400" />
+                          <FileText size={11} className="text-blue-600" />
                           <span>{citationLabel}</span>
                         </div>
                       );
@@ -313,7 +312,7 @@ export const ChatDock: React.FC = () => {
 
           {/* Error Banner */}
           {error && (
-            <div className="flex items-center gap-2 border-t border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs text-rose-300">
+            <div className="flex items-center gap-2 border-t border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700">
               <AlertCircle size={14} className="shrink-0" />
               <span>{error}</span>
             </div>
@@ -321,7 +320,7 @@ export const ChatDock: React.FC = () => {
 
           {/* Quick Prompt Chips */}
           {messages.length === 1 && !loading && (
-            <div className="border-t border-white/[0.08] bg-slate-950/50 px-4 py-2.5">
+            <div className="border-t border-slate-200 bg-white px-4 py-2.5">
               <span className="font-mono text-[0.62rem] uppercase tracking-wider text-slate-500 block mb-1.5">
                 Suggested Dispatches & Rules
               </span>
@@ -334,9 +333,9 @@ export const ChatDock: React.FC = () => {
                   <button
                     key={label}
                     onClick={() => handleStarterChip(query)}
-                    className="flex items-center gap-1 rounded-lg border border-white/[0.08] bg-slate-800/60 px-2.5 py-1 text-[0.68rem] font-medium text-slate-300 hover:border-blue-500/40 hover:text-white transition-all"
+                    className="flex items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[0.68rem] font-medium text-slate-700 hover:border-blue-600 hover:text-blue-600 transition-all shadow-sm"
                   >
-                    <Icon size={11} className="text-blue-400" />
+                    <Icon size={11} className="text-blue-600" />
                     <span>{label}</span>
                   </button>
                 ))}
@@ -345,7 +344,7 @@ export const ChatDock: React.FC = () => {
           )}
 
           {/* Input Bar */}
-          <div className="border-t border-white/[0.08] bg-slate-950/80 p-3">
+          <div className="border-t border-slate-200 bg-white p-3">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -359,12 +358,12 @@ export const ChatDock: React.FC = () => {
                 onChange={(e) => setMessage(e.target.value)}
                 disabled={loading}
                 placeholder="Ask Rig about parameters, routes, or HOS rules…"
-                className="flex-1 rounded-xl border border-white/[0.08] bg-slate-900/90 px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none disabled:opacity-50"
+                className="flex-1 rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-blue-600 focus:bg-white focus:ring-1 focus:ring-blue-600 focus:outline-none disabled:opacity-50"
               />
               <button
                 type="submit"
                 disabled={loading || !message.trim()}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-40 disabled:pointer-events-none shadow-sm"
               >
                 <Send size={14} />
               </button>
